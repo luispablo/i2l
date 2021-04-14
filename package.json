@@ -1,8 +1,11 @@
 {
   "name": "i2l",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Turn items in the clipboard to a list",
   "main": "index.js",
+  "bin": {
+    "i2l": "./index.js"
+  },  
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
