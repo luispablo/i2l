@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-// TODO: -t remove spaces
 // TODO: -l toLower items
 // TODO: -q remove quotes
 
 const HELP_OPTION = ["h", "help"];
+const TRIM_OPTION = ["t", "trim"];
 
 const buildHasOption = function buildHasOption (argv) {
   const options = argv.filter(a => a[0] === "-");
@@ -27,6 +27,9 @@ DESCRIPTION
 
     -t, --trim
               Removes start and end spaces, turns " an_item  " into "an_item"
+
+    -h, --help
+              Print this help message
   `);
 };
 
@@ -40,7 +43,11 @@ DESCRIPTION
       const clipboardy = require("clipboardy");
   
       const items = clipboardy.readSync().split("\n");
-      const quotedItems = items.map(i => `'${i}'`);
+      const processedItems = items.reduce(function (prev, curr) {
+        const trimmed = hasOption(TRIM_OPTION) ? curr.trim() : curr;
+        return prev.concat([trimmed]);
+      }, []);
+      const quotedItems = processedItems.map(i => `'${i}'`);
       const joinedQuotedItems = quotedItems.join(", ");
   
       clipboardy.writeSync(joinedQuotedItems);
