@@ -1,6 +1,6 @@
 {
   "name": "i2l",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Turn items in the clipboard to a list",
   "main": "index.js",
   "bin": {
