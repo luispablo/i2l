@@ -1,17 +1,13 @@
 #!/usr/bin/env node
 
-// TODO: -q remove quotes
+const HELP_OPTION = "h";
+const LOWER_OPTION = "l";
+const TRIM_OPTION = "t";
+const QUOTE_OPTION = "q";
 
-const HELP_OPTION = ["h", "help"];
-const LOWER_OPTION = ["l", "lower"];
-const TRIM_OPTION = ["t", "trim"];
-
-const buildHasOption = function buildHasOption (argv) {
-  const options = argv.filter(a => a[0] === "-");
-
-  return function hasOption (option) {
-    return options.some(o => `-${option[0]}` === o || `--${option[1]}` === o);
-  };
+const buildHasOption = function buildHasOption (options) {
+  const optionsArray = options && options.indexOf("-") === 0 ? options.substring(1).split("") : [];
+  return option => optionsArray.indexOf(option) >= 0;
 };
 
 const printHelp = function printHelp () {
@@ -20,25 +16,33 @@ NAME
     i2l - Turn a set of items into a list
 
 SYNOPSIS
-    i2l [OPTIONS]...
+    i2l -[OPTIONS]...
 
 DESCRIPTION
     This tool takes the content from the clipboard and leaves the result also there, replacing the original content.
 
-    -h, --help
-              Print this help message
+    -h
+        Print this help message
 
-    -l, --lower
-              Turn to lowercase each item
+    -l
+        Turn to lowercase each item
 
-    -t, --trim
-              Removes start and end spaces, turns " an_item  " into "an_item"
+    -t
+        Removes start and end spaces, turns " an_item  " into "an_item"
+
+    -q
+        Removes both single and double quotes from each item
+
+EXAMPLES
+
+    i2l -lt
+    // This will lower and trim each item
   `);
 };
 
 (async function main () {
   try {
-    const hasOption = buildHasOption(process.argv);
+    const hasOption = buildHasOption(process.argv[2]);
 
     if (hasOption(HELP_OPTION)) {
       printHelp();
@@ -49,7 +53,8 @@ DESCRIPTION
       const processedItems = items.reduce(function (prev, curr) {
         const trimmed = hasOption(TRIM_OPTION) ? curr.trim() : curr;
         const lowered = hasOption(LOWER_OPTION) ? trimmed.toLowerCase() : trimmed;
-        return prev.concat([lowered]);
+        const noQuote = hasOption(QUOTE_OPTION) ? lowered.replace(/['"]/g, "") : lowered;
+        return prev.concat([noQuote]);
       }, []);
       const quotedItems = processedItems.map(i => `'${i}'`);
       const joinedQuotedItems = quotedItems.join(", ");
